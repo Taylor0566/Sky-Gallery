@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+
+:root {
+  --background: #87ceeb;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.sky-bg {
+  /* 渐变天空背景 */
+  background: linear-gradient(180deg, #6ec1ff 0%, #86d8ff 35%, #bfefff 70%, #e9faff 100%);
+  position: relative;
+}
+
+/* 轻微阳光晕染层 */
+.sky-bg::before {
+  content: "";
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background-image:
+    radial-gradient(1200px 800px at 10% 10%, rgba(255,255,255,0.35), transparent 60%),
+    radial-gradient(800px 600px at 90% 15%, rgba(255,255,255,0.25), transparent 60%);
+  pointer-events: none;
+}
+
+/* 三层云层，使用多重径向渐变模拟云朵并缓慢水平漂移 */
+.cloud-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.6;
+  pointer-events: none;
+  background-repeat: repeat-x;
+  background-size: 520px auto;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
+}
+.cloud-layer.layer1 {
+  opacity: 0.6;
+  background-position: 0 20px, 200px 10px, 420px 30px, 640px 15px, 860px 25px;
+  background-image:
+    url('/cloud.svg'),
+    url('/cloud.svg'),
+    url('/cloud.svg'),
+    url('/cloud.svg'),
+    url('/cloud.svg');
+  animation: cloudsMoveL1 80s linear infinite;
+}
+.cloud-layer.layer2 {
+  animation-duration: 110s;
+  opacity: 0.5;
+  transform: translateY(32px);
+  background-size: 620px auto;
+  background-position: 0 60px, 240px 55px, 480px 58px, 720px 52px;
+  background-image:
+    url('/cloud.svg'),
+    url('/cloud.svg'),
+    url('/cloud.svg'),
+    url('/cloud.svg');
+  animation: cloudsMoveL2 110s linear infinite;
+}
+.cloud-layer.layer3 {
+  animation-duration: 150s;
+  opacity: 0.45;
+  transform: translateY(62px);
+  background-size: 720px auto;
+  background-position: 0 100px, 280px 98px, 560px 102px;
+  background-image:
+    url('/cloud.svg'),
+    url('/cloud.svg'),
+    url('/cloud.svg');
+  animation: cloudsMoveL3 150s linear infinite;
+}
+
+@keyframes cloudsMoveL1 {
+  from { background-position: 0 20px, 200px 10px, 420px 30px, 640px 15px, 860px 25px; }
+  to { background-position: 1600px 20px, 1800px 10px, 2020px 30px, 2240px 15px, 2460px 25px; }
+}
+@keyframes cloudsMoveL2 {
+  from { background-position: 0 60px, 240px 55px, 480px 58px, 720px 52px; }
+  to { background-position: 1600px 60px, 1840px 55px, 2080px 58px, 2320px 52px; }
+}
+@keyframes cloudsMoveL3 {
+  from { background-position: 0 100px, 280px 98px, 560px 102px; }
+  to { background-position: 1600px 100px, 1880px 98px, 2160px 102px; }
+}
+
+/* 英雄区消失动画（标题、副标题、CTA按钮） */
+.hero-fade-base {
+  will-change: opacity, transform;
+  animation-name: heroFadeOut;
+  animation-duration: 900ms;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+.hero-title { animation-delay: 5.6s; }
+.hero-sub { animation-delay: 6.0s; }
+.hero-cta { animation-delay: 6.4s; }
+
+@keyframes heroFadeOut {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-8px) scale(0.98); }
+}

@@ -19,7 +19,9 @@ async function ensureDir() {
 const hasKV = Boolean(
   process.env.KV_REST_API_URL || process.env.KV_URL || process.env.VERCEL_KV_REST_API_URL
 );
-const hasBlob = Boolean(
+// Blob：区分读写能力——写需要 BLOB_READ_WRITE_TOKEN；读可从 BLOB_URL 或写令牌推断
+const hasBlobWrite = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+const hasBlobRead = Boolean(
   process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_TOKEN || process.env.BLOB_URL
 );
 
@@ -65,12 +67,16 @@ async function writeJsonArrayBlob<T>(file: string, data: T[]): Promise<void> {
   await put(blobKey, JSON.stringify(data, null, 2), {
     access: "public",
     contentType: "application/json",
+    // 点赞/评论等会频繁更新相同 JSON 路径，需要允许覆盖
+    allowOverwrite: true,
+    // 降低缓存持续时间，便于较快看到更新内容
+    cacheControlMaxAge: 60,
   });
 }
 
 async function readJsonArray<T>(file: string): Promise<T[]> {
   if (hasKV) return readJsonArrayKV<T>(file);
-  if (hasBlob) return readJsonArrayBlob<T>(file);
+  if (hasBlobRead) return readJsonArrayBlob<T>(file);
   await ensureDir();
   const writablePath = path.join(localWritableDir, file);
   const readonlyPath = path.join(baseDataDir, file);
@@ -91,7 +97,7 @@ async function readJsonArray<T>(file: string): Promise<T[]> {
 
 async function writeJsonArray<T>(file: string, data: T[]): Promise<void> {
   if (hasKV) return writeJsonArrayKV<T>(file, data);
-  if (hasBlob) return writeJsonArrayBlob<T>(file, data);
+  if (hasBlobWrite) return writeJsonArrayBlob<T>(file, data);
   await ensureDir();
   const filePath = path.join(localWritableDir, file);
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");

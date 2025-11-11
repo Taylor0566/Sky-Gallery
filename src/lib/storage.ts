@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
-import type { User, Artwork, Like, Visit } from "./types";
+import type { User, Artwork, Like, Visit, Comment, CommentLike } from "./types";
 
 const dataDir = path.join(process.cwd(), "data");
 
@@ -81,4 +81,20 @@ export async function getOrCreateUser(userId?: string, name?: string): Promise<U
     await saveUsers(users);
   }
   return user;
+}
+
+// Comments
+export async function getComments() {
+  return readJsonArray<Comment>("comments.json");
+}
+export async function saveComments(comments: Comment[]) {
+  return writeJsonArray<Comment>("comments.json", comments);
+}
+
+// Comment Likes
+export async function getCommentLikes() {
+  return readJsonArray<CommentLike>("commentLikes.json");
+}
+export async function saveCommentLikes(commentLikes: CommentLike[]) {
+  return writeJsonArray<CommentLike>("commentLikes.json", commentLikes);
 }

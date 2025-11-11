@@ -30,6 +30,19 @@ const zhCN = {
   "actions.like": "点赞",
   "actions.unlike": "取消点赞",
   "actions.close": "关闭",
+  
+  "comments.title": "评论",
+  "comments.placeholder": "输入评论…",
+  "comments.submit": "发表",
+  "comments.loading": "加载评论中…",
+  "comments.empty": "暂无评论",
+  
+  "error.commentPostFailed": "发表评论失败",
+  "error.loadCommentsFailed": "加载评论失败",
+  "error.network": "网络错误",
+  
+  "notify.liked": "已点赞",
+  "notify.unliked": "已取消点赞",
 };
 
 const zhTW = {
@@ -61,6 +74,19 @@ const zhTW = {
   "actions.like": "按讚",
   "actions.unlike": "取消按讚",
   "actions.close": "關閉",
+  
+  "comments.title": "評論",
+  "comments.placeholder": "輸入評論…",
+  "comments.submit": "發表",
+  "comments.loading": "載入評論中…",
+  "comments.empty": "暫無評論",
+  
+  "error.commentPostFailed": "發表評論失敗",
+  "error.loadCommentsFailed": "載入評論失敗",
+  "error.network": "網路錯誤",
+  
+  "notify.liked": "已按讚",
+  "notify.unliked": "已取消按讚",
 };
 
 const en = {
@@ -92,6 +118,19 @@ const en = {
   "actions.like": "Like",
   "actions.unlike": "Unlike",
   "actions.close": "Close",
+  
+  "comments.title": "Comments",
+  "comments.placeholder": "Write a comment…",
+  "comments.submit": "Post",
+  "comments.loading": "Loading comments…",
+  "comments.empty": "No comments yet",
+  
+  "error.commentPostFailed": "Failed to post comment",
+  "error.loadCommentsFailed": "Failed to load comments",
+  "error.network": "Network error",
+  
+  "notify.liked": "Liked",
+  "notify.unliked": "Unliked",
 };
 
 const fr = {
@@ -123,6 +162,19 @@ const fr = {
   "actions.like": "J’aime",
   "actions.unlike": "Ne plus aimer",
   "actions.close": "Fermer",
+  
+  "comments.title": "Commentaires",
+  "comments.placeholder": "Écrire un commentaire…",
+  "comments.submit": "Publier",
+  "comments.loading": "Chargement des commentaires…",
+  "comments.empty": "Aucun commentaire",
+  
+  "error.commentPostFailed": "Échec de la publication du commentaire",
+  "error.loadCommentsFailed": "Échec du chargement des commentaires",
+  "error.network": "Erreur réseau",
+  
+  "notify.liked": "Aimé",
+  "notify.unliked": "Je n’aime plus",
 };
 
 export const translations: Record<Lang, Record<string, string>> = {

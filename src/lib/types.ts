@@ -31,3 +31,19 @@ export type LeaderboardItem = {
   artwork: Artwork;
   user?: User;
 };
+
+export type Comment = {
+  id: string;
+  artworkId: string;
+  userId: string;
+  content: string;
+  createdAt: number; // epoch millis
+  likesCount: number;
+};
+
+export type CommentLike = {
+  id: string;
+  userId: string;
+  commentId: string;
+  createdAt: number; // epoch millis
+};

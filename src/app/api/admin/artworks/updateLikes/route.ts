@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { getArtworks, saveArtworks } from "@/lib/storage";
 
-export async function POST(req: Request) {
-  const store = await cookies();
-  const isAdmin = store.get("adminAuth")?.value === "1";
-  if (!isAdmin) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-  const body = await req.json().catch(() => ({} as any));
+export async function POST(request: NextRequest) {
+  try {
+    const store = await cookies();
+    const isAdmin = store.get("adminAuth")?.value === "1";
+    if (!isAdmin) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+    const body = await request.json().catch(() => ({} as any));
   const rawId = body?.id;
   const likesCountRaw = body?.likesCount;
   const likesCount = Number(likesCountRaw);
@@ -29,5 +30,7 @@ export async function POST(req: Request) {
   target.likesCount = likesCount;
   await saveArtworks(artworks);
   return NextResponse.json({ ok: true, likesCount, artworks });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+  }
 }
-

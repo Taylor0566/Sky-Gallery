@@ -64,6 +64,40 @@
   登录成功后会在 Cookie 中写入 `adminAuth=1`，以访问管理员相关接口与页面。
 - 其他：`src/lib/config.ts` 中支持 `ADMIN_USER_IDS` 或 `ADMIN_USER_ID`（当前管理员接口主要基于上面的账密验证）。
 
+### 持久化存储（生产可选）
+
+本项目在生产环境支持持久化存储，优先使用 Vercel KV，其次使用 Vercel Blob，若均未配置则自动回退到本地 JSON 文件（`/data/*.json`）。
+
+- 推荐使用 Vercel KV（读写）：
+  ```env
+  # Vercel KV 服务端调用所需变量（REST 方式）
+  KV_REST_API_URL=your_kv_rest_api_url
+  KV_REST_API_TOKEN=your_kv_rest_api_token
+  ```
+- 或使用 Vercel Blob（读写）：
+  ```env
+  # Vercel Blob 读写令牌（Serverless 函数中使用）
+  BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
+  ```
+
+使用策略：
+- 若配置了 KV（`KV_REST_API_URL`/`KV_URL` 等），则读写通过 KV；
+- 否则若配置了 Blob（`BLOB_READ_WRITE_TOKEN` 等），则读写通过 Blob；
+- 否则回退到本地 JSON 文件（开发/演示场景）。
+
+环境变量的读取逻辑位于 `src/lib/storage.ts`，无需额外改动代码即可在不同环境间切换。
+
+## 部署到 Vercel（推荐）
+
+1. 在 Vercel 新建项目并导入此仓库。
+2. 在项目的 Settings → Environment Variables 中设置：
+   - 管理员登录：`ADMIN_USERNAME`、`ADMIN_PASSWORD`。
+   - 持久化（二选一或均配置）：
+     - KV：`KV_REST_API_URL`、`KV_REST_API_TOKEN`。
+     - Blob：`BLOB_READ_WRITE_TOKEN`。
+3. 直接部署。无需额外构建命令，Vercel 将自动执行 `build` 并产出 API 路由与页面。
+4. 部署完成后即可使用持久化存储（若配置），未配置则按本地 JSON 逻辑运行（适合演示）。
+
 ## 数据模型（简化）
 
 - `Artwork`：`{ id, userId, title?, dataUrl, createdAt, likesCount }`

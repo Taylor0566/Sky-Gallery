@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { getArtworks, saveArtworks, getOrCreateUser } from "@/lib/storage";
 
@@ -11,13 +11,14 @@ type Body = {
   authorName?: string;
 };
 
-export async function POST(req: Request) {
-  const store = await cookies();
-  const isAdmin = store.get("adminAuth")?.value === "1";
-  if (!isAdmin) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-  const body = (await req.json().catch(() => ({}))) as Partial<Body>;
+export async function POST(request: NextRequest) {
+  try {
+    const store = await cookies();
+    const isAdmin = store.get("adminAuth")?.value === "1";
+    if (!isAdmin) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+    const body = (await request.json().catch(() => ({}))) as Partial<Body>;
   const rawId = body?.id;
   if (!rawId || typeof rawId !== "string") {
     return NextResponse.json({ error: "Invalid artwork id" }, { status: 400 });
@@ -62,5 +63,7 @@ export async function POST(req: Request) {
 
   await saveArtworks(artworks);
   return NextResponse.json({ ok: true, artwork: target, artworks });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+  }
 }
-

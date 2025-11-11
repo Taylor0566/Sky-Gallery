@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
-export async function POST(req: Request) {
-  const body = await req.json().catch(() => ({}));
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => ({}));
   const username = (body?.username || "").toString();
   const password = (body?.password || "").toString();
   const envUser = (process.env.ADMIN_USERNAME || "").trim();

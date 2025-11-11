@@ -5,11 +5,14 @@ import type { User, Artwork, Like, Visit, Comment, CommentLike } from "./types";
 import { kv } from "@vercel/kv";
 import { list, put } from "@vercel/blob";
 
-const dataDir = path.join(process.cwd(), "data");
+const baseDataDir = path.join(process.cwd(), "data");
+const isServerlessEnv = Boolean(process.env.VERCEL || process.env.AWS_REGION || process.env.LAMBDA_TASK_ROOT);
+// 在 Vercel/AWS Lambda 等环境下，/var/task 是只读；改为写入 /tmp（临时，不持久）。
+const localWritableDir = isServerlessEnv ? path.join("/tmp", "sky-gallery-data") : baseDataDir;
 
 async function ensureDir() {
   try {
-    await fs.mkdir(dataDir, { recursive: true });
+    await fs.mkdir(localWritableDir, { recursive: true });
   } catch {}
 }
 
@@ -69,9 +72,16 @@ async function readJsonArray<T>(file: string): Promise<T[]> {
   if (hasKV) return readJsonArrayKV<T>(file);
   if (hasBlob) return readJsonArrayBlob<T>(file);
   await ensureDir();
-  const filePath = path.join(dataDir, file);
+  const writablePath = path.join(localWritableDir, file);
+  const readonlyPath = path.join(baseDataDir, file);
+  // 先尝试读取可写目录（/tmp 或本地 data），若不存在则回退到只读源（/var/task/data）。
   try {
-    const content = await fs.readFile(filePath, "utf-8");
+    const content = await fs.readFile(writablePath, "utf-8");
+    const arr = JSON.parse(content) as T[];
+    return Array.isArray(arr) ? arr : [];
+  } catch {}
+  try {
+    const content = await fs.readFile(readonlyPath, "utf-8");
     const arr = JSON.parse(content) as T[];
     return Array.isArray(arr) ? arr : [];
   } catch {
@@ -83,7 +93,7 @@ async function writeJsonArray<T>(file: string, data: T[]): Promise<void> {
   if (hasKV) return writeJsonArrayKV<T>(file, data);
   if (hasBlob) return writeJsonArrayBlob<T>(file, data);
   await ensureDir();
-  const filePath = path.join(dataDir, file);
+  const filePath = path.join(localWritableDir, file);
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 

@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { getArtworks, saveArtworks, getLikes, saveLikes } from "@/lib/storage";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const store = await cookies();
   const isAdmin = store.get("adminAuth")?.value === "1";
   if (!isAdmin) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
-  const raw = params.id;
+  const { id: raw } = await params;
   const id = typeof raw === "string" ? raw.trim() : String(raw ?? "");
   const decoded = decodeURIComponent(id);
   const artworks = await getArtworks();
@@ -25,16 +25,16 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   return NextResponse.json({ ok: true });
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const store = await cookies();
   const isAdmin = store.get("adminAuth")?.value === "1";
   if (!isAdmin) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
-  const raw = params.id;
+  const { id: raw } = await params;
   const id = typeof raw === "string" ? raw.trim() : String(raw ?? "");
   const decoded = decodeURIComponent(id);
-  const body = await req.json().catch(() => ({}));
+  const body = await request.json().catch(() => ({}));
   const likesCountRaw = body?.likesCount;
   const likesCount = Number(likesCountRaw);
   if (!Number.isFinite(likesCount) || likesCount < 0 || Math.floor(likesCount) !== likesCount) {
